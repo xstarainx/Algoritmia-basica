@@ -1,5 +1,5 @@
-#ifndef MONTICULO_H
-#define MONTICULO_H
+#ifndef MONtICULO_H
+#define MONtICULO_H
 
 #include <iostream>
 using namespace std;
@@ -8,9 +8,9 @@ template<typename t> struct mont;
 
 template<typename t> void crearVacia(mont<t>& m);
 
-template<typename t> void insertar(const mont<t>& m, const T& d);
+template<typename t> void insertar(const mont<t>& m, const t& d);
 
-template<typename t> bool borrar(const mont<t>& m, const T& d);
+template<typename t> bool borrar(const mont<t>& m, const t& d);
 
 template<typename t> bool min(const mont<t>& m);
 
@@ -41,12 +41,12 @@ void crearVacia(mont<t>& m) {
 }
 
 template<typename t> 
-void insertar(const mont<t>& m, const T& d) {
+void insertar(const mont<t>& m, const t& d) {
 
 }
 
 template<typename t>
-bool borrar(const mont<t>& m, const T& d) {
+bool borrar(const mont<t>& m, const t& d) {
 
 }
 

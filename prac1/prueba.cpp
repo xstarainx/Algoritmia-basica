@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <map>
+#include "monticulo.h"
 
 const int MAX_CHARS = 300;
 
