@@ -16,7 +16,7 @@ RM = /bin/rm -f  # para limpiar
 CC = g++         # para compilar
 #---------------------------------------------------------
 # para compilación y enlazado ("linkado")
-CPPFLAGS=-I. -std=c++11     # opciones compilación
+CPPFLAGS=-I. -O2 -std=c++11     # opciones compilación
 #---------------------------------------------------------
 # vars
 EJEC = prueba

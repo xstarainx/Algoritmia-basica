@@ -8,6 +8,8 @@ template<typename t> struct mont;
 
 template<typename t> void crearVacia(mont<t>& m);
 
+template<typename t> bool esVacia(const mont<t>& m);
+
 template<typename t> void insertar(const mont<t>& m, const t& d);
 
 template<typename t> bool borrar(const mont<t>& m, const t& d);
@@ -17,10 +19,11 @@ template<typename t> bool min(const mont<t>& m);
 
 template<typename t>
 struct mont {
-	friend void crearVacia();
-	friend void insertar();
-	friend bool borrar();
-	friend bool min();
+	friend void crearVacia<t>(mont<t>& m);
+	friend bool esVacia<t>(const mont<t>& m);
+	friend void insertar<t>(const mont<t>& m, const t& d);
+	friend bool borrar<t>(const mont<t>& m, const t& d);
+	friend bool min<t>(const mont<t>& m);
 
 private:
 	struct Nodo{
@@ -37,11 +40,28 @@ private:
 
 template<typename t> 
 void crearVacia(mont<t>& m) {
+	m.total = 0;
+	m.raiz = NULL;
+}
 
+
+template<typename t>
+bool esVacia(const mont<t>& m) {
+	if(m.total == 0) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 template<typename t> 
 void insertar(const mont<t>& m, const t& d) {
+	int i;
+	bool debeSubir;
+	t aux;
+	m.total++;
+	
 
 }
 
@@ -51,8 +71,14 @@ bool borrar(const mont<t>& m, const t& d) {
 }
 
 template<typename t>
-bool min(const mont<t>& m) {
-	
+bool min(const mont<t>& m, t minimo) {
+	if(!esVacia(m)) {
+		minimo = m.raiz;
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 
