@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 		cout << "Numero de parametros incorrecto" << endl;
 		exit(0);
 	}
-
+    //PRUEBA
 	string nom_fich = argv[1];
 
 	ifstream f;		//Flujo de entrada
