@@ -1,0 +1,188 @@
+//*****************************************************************
+// Author: Miguel Gómez Lahera (Nip: 741302)
+//         Daniel Fraile Belmonte (Nip: 721525)
+// Date:   6 de noviembre 2017
+//*****************************************************************
+
+#include <iostream>
+#include <fstream>
+#include <cstring>
+#include "participante.h"
+#include "rondaSeleccion.h"
+
+using namespace std;
+
+int main() {
+	ifstream f;					//flujo de entrada f
+	ofstream f2;				//flujo de salida f2
+	f.open("rondaentrada_6.txt");
+	f2.open("rondasalida.txt");
+	if(f.is_open() && f2.is_open()) {
+		ronda<string,participante> r;
+		crear(r);
+		string lectura;			//Cadena que contiene la instruccion
+		string nombre;			//Cadena que contiene la clave del participante
+		string otro;			//Cadena de salto de linea
+		string dato;			//Cadena que contiene los datos del participante
+		participante p;
+		while(!f.eof()) {
+			f >> lectura;
+			getline(f,otro);
+			//Instruccion inscribir participante
+			if(lectura=="ipa"){
+				f >> nombre;
+				getline(f,otro);
+				getline(f,dato);
+				p=inicializar(dato,0,0,0);
+				int aux=cardinal(r);
+				if(anyadir(r,nombre,p))	{	//Si se puede inscribir
+					if(aux != cardinal(r)){
+						f2 << "participante INSCRITO: " + nombre + ";" + to_string(p) + "\n";
+					}
+					else {
+						f2 << "participante ACTUALIZADO: " + nombre + ";" + to_string(p) + "\n";
+					}
+				}
+				else{
+					f2 << "inscripcion CERRADA: " + nombre + ";" + to_string(p) + "\n";
+				}
+			}
+			//Instruccion mostrar participante
+			else if(lectura=="mpa"){
+					f >> nombre;
+					if(obtenerValor(r,nombre,p)){	//Si se ha encontrado el participante
+						f2 << "participante ENCONTRADO: " + nombre + ";" + to_string(p) + "\n";
+					}
+					else{	//Si el participante no existe
+						f2 << "participante DESCONOCIDO: " + nombre + "\n";
+					}
+			}
+			//Instruccion borrar participante
+			else if(lectura=="bpa"){
+				f >> nombre;
+				getline(f,otro);
+				if(quitar(r,nombre)){	//Si se realiza el borrado con exito
+					f2 << "participante BORRADO: " + nombre + "\n";
+				}
+				else {	
+					if(enSeleccion(r)){	//Caso en el que el participante no puede ser borrado 
+										//por estar en estado de SELECCION
+						f2 << "BORRADO participante DESCARTADO: " + nombre + "\n";
+					}
+					else {	
+						f2 << "participante NO ENCONTRADO: " + nombre + "\n";
+					}	
+				}
+			}
+			//Instruccion actualizar candidato
+			else if(lectura=="ac") {
+				if(!obtenerCandidato(r,nombre,p)){
+					if(!enSeleccion(r)) {
+						f2 << "ACTUALIZACION candidato DESCARTADA" << "\n";
+					}
+					else {	//Si el estado actual de ronda es el de INSCRIPCION
+						f2 << "ronda VACIA" << "\n";
+					}
+				}
+				string caracter;	//caracter A, F o P
+				f >> caracter;
+				getline(f,otro);
+				if(caracter=="A"){
+					modificarA(p);
+				}
+				else if(caracter=="F"){
+					modificarF(p);
+				}
+				else if(caracter=="P"){
+					modificarP(p);
+				}
+				if(actualizarCandidato(r,p)){
+					f2 << "candidato ACTUALIZADO: " + nombre + ";" + to_string(p) + "\n";
+				}
+			}
+			//Intruccion pasar turno
+			else if(lectura=="pt"){
+				if(pasarTurno(r)){	//Si un participante tiene el turno
+					obtenerCandidato(r,nombre,p);
+					f2 << "TURNO en candidato: " + nombre + ";" + to_string(p) + "\n";
+				}
+				else {	
+					if(!enSeleccion(r)) {//En el caso de que no haya participantes
+						f2 << "CAMBIO de turno DESCARTADO" << "\n";
+					}
+					else{	//Si el estado actual es de INSCRIPCION
+
+						f2 << "ronda VACIA" << "\n";
+					}
+				}
+			}
+			//Instruccion cerrar inscripcion
+			else if(lectura=="ci") {
+				if(cerrarInscripcion(r)){	//Si se puede cerrar la inscripcion
+					f2 << "inscripcion CERRADA con participantes TOTALES: ";
+					f2 << cardinal(r);
+					f2 << "\n";
+				}
+				else{	//Caso contrario
+					f2 << "CIERRE de inscripcion DESCARTADO" << "\n";
+				}
+			}
+			//Instruccion obtener candidato
+			else if(lectura=="oc"){
+				if(obtenerCandidato(r,nombre,p)){
+					f2 << "CANDIDATO a evaluar: " + nombre + ";" + to_string(p) + "\n";
+				}
+				else {
+					if(!enSeleccion(r)){	//Si esta en estado de SELECCION
+						f2 << "CONSULTA candidato DESCARTADA" << "\n";
+					}
+					else{	//No esta vacia
+						f2 << "ronda VACIA" << "\n";
+					}
+				}
+			}
+			//Instruccion descartar candidato
+			else if(lectura=="dc"){
+				obtenerCandidato(r,nombre,p);
+				if(eliminarCandidato(r)){	//Si es posible descartar el candidato
+					f2 << "candidato ELIMINADO: " + nombre + ";" + to_string(p) + "\n";
+				}
+				else{	
+					//Si la ronda esta vacia
+					if(!enSeleccion(r)) {
+						f2 << "ELIMINACION candidato DESCARTADA" << "\n";	
+					}
+					else{	//Si la ronda esta en estado de INSCRIPCION
+						f2 << "ronda VACIA" << "\n";
+					}
+				}
+			}
+			//Instruccion listar ronda
+			else if(lectura=="lr"){
+				if(!enSeleccion(r)){	//Si esta en estado de INSCRIPCION
+					f2 << "***** Ronda en fase: INSCRIPCION" << "\n";
+					f2 << "TOTAL: ";
+					f2 << cardinal(r);
+					f2 << "\n";
+					f2 << listar(r);
+				}
+				else {	//Si esta en estado de SELECCION
+					f2 << "***** Ronda en fase: SELECCION" << "\n";
+					f2 << "TOTAL: ";
+					f2 << cardinal(r);
+					f2 << "\n";
+					if(obtenerCandidato(r,nombre,p)){
+						f2 << listar(r);
+						f2 << "TURNO en candidato: " + nombre + "\n";
+					}
+					else {
+						f2 << "TURNO en candidato: ---" << "\n";
+					}
+				}
+				f2 << "*****" << "\n";
+			}
+		}
+	}
+	f.close();
+	f2.close();
+}
