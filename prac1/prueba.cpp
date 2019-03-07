@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <map>
+#include "arbol.h"
 
 const int MAX_CHARS = 300;
 
@@ -36,13 +37,13 @@ int main(int argc, char *argv[]) {
 			tabla[c] += 1;
 		}
 
-		
+
 		//Iterador que muestra la tabla de frecuencias
 		map<char, int>::iterator it;
 		for ( it = tabla.begin(); it != tabla.end(); it++) {
     		std::cout << it->first << ':'<< it->second << std::endl ;
 		}
-		
+
 
 
 		f.close();
