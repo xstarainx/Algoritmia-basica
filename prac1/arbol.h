@@ -42,7 +42,7 @@ void crearHoja (arbol<C,F>& a, const C& c, const F& f){
 	//a.iter = nullptr;
 }
 
-template<typename T>
+template<typename C, typename F>
 void crearArbol (arbol<C,F>& a, const C& c, const F& f, const arbol<C,F>& izq, const arbol<C,F>& der){
   typename arbol<C,F>::Nodo* aux= new typename arbol<C,F>::Nodo;
   aux->elementoC = c;
