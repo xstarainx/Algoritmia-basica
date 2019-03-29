@@ -36,8 +36,8 @@ void crearHoja (arbol<C,F>& a, const C& c, const F& f){
   typename arbol<C,F>::Nodo* aux= new typename arbol<C,F>::Nodo;
   aux->elementoC = c;
   aux->elementoF = f;
-	aux->h_der = nullptr;
-  aux->h_izq = nullptr;
+	aux->h_der = NULL;
+  aux->h_izq = NULL;
 	a.raiz = aux;
 	//a.iter = nullptr;
 }

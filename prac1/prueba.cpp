@@ -6,12 +6,24 @@
 #include <stdlib.h>
 #include <fstream>
 #include <map>
-#include "monticulo.h"
 #include "arbol.h"
+#include "monticulo.h"
+
 
 const int MAX_CHARS = 300;
 
 using namespace std;
+
+
+void funcHuffman(map<char,int>tabla_frec) {
+	mont<arbol> cola;
+	int i,fx,fy,fz;
+	//arbol z,x,y;
+
+	crearVacia(cola);
+
+}
+
 
 int main(int argc, char *argv[]) {
 	//Si el numero de parametros es incorrecto indicar y finalizar
@@ -31,23 +43,23 @@ int main(int argc, char *argv[]) {
 		cout << "Abierto correctamente" << endl;
 
 		char c;
-		map<char,int> tabla;
+		map<char,int> tabla_frec;
 		//Recorrido del fichero contando apariciones
 		while(!f.eof()) {
 			c = f.get();
-			tabla[c] += 1;
+			tabla_frec[c] += 1;
 		}
 
+		f.close();
 
 		//Iterador que muestra la tabla de frecuencias
 		map<char, int>::iterator it;
-		for ( it = tabla.begin(); it != tabla.end(); it++) {
+		for ( it = tabla_frec.begin(); it != tabla_frec.end(); it++) {
     		std::cout << it->first << ':'<< it->second << std::endl ;
 		}
 
-
-
-		f.close();
+		funcHuffman(tabla_frec);
+		
 	}
 	else {
 		cout << "Error al abrir el fichero o nombre de fichero incorrecto" << nom_fich << endl;
