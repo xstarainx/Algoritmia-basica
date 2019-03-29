@@ -9,20 +9,21 @@
 
 #include <iostream>
 
-template<typename T> struct arbol;
+template<typename C, typename F> struct arbol;
 
-template<typename T> void crearHoja (arbol<T>& a, const T& elem);
+template<typename C, typename F> void crearHoja (arbol<C,F>& a, const C& c, const F& f);
 
-template<typename T> void crearArbol (arbol<T>& a, const T& elem, const arbol<T>& izq, const arbol<T>& der);
+template<typename C, typename F> void crearArbol (arbol<C,F>& a, const C& c, const F& f, const arbol<C,F>& izq, const arbol<C,F>& der);
 
-template<typename T>
+template<typename C, typename F>
 struct arbol{
-  friend void crearHoja<T> (arbol<T>& a, const T& elem);
-  friend void crearArbol<T> (arbol<T>& a, const T& elem, const arbol<T>& izq, const arbol<T>& der);
+  friend void crearHoja<C,F> (arbol<C,F>& a, const C& c, const F& f);
+  friend void crearArbol<C,F> (arbol<C,F>& a, const C& c, const F& f, const arbol<C,F>& izq, const arbol<C,F>& der);
 
 	private:	//declaracion de la representacion interna del tipo:
 	struct Nodo{
-			T elemento;
+			C elementoC;
+      F elementoF;
 			Nodo* h_der;
 			Nodo* h_izq;
 	};
@@ -30,23 +31,25 @@ struct arbol{
 	//pila<Nodo*> iter;
 };
 
-template<typename T>
-void crearHoja (arbol<T>& a, const T& elem){
-  typename arbol<T>::Nodo* aux= new typename arbol<T>::Nodo;
-  aux->elemento = elem;
+template<typename C, typename F>
+void crearHoja (arbol<C,F>& a, const C& c, const F& f){
+  typename arbol<C,F>::Nodo* aux= new typename arbol<C,F>::Nodo;
+  aux->elementoC = c;
+  aux->elementoF = f;
 	aux->h_der = nullptr;
   aux->h_izq = nullptr;
 	a.raiz = aux;
-	a.iter = nullptr;
+	//a.iter = nullptr;
 }
 
 template<typename T>
-void crearArbol (arbol<T>& a, const T& elem, const arbol<T>& izq, const arbol<T>& der){
-  typename arbol<T>::Nodo* aux= new typename arbol<T>::Nodo;
-  aux->elemento = elem;
+void crearArbol (arbol<C,F>& a, const C& c, const F& f, const arbol<C,F>& izq, const arbol<C,F>& der){
+  typename arbol<C,F>::Nodo* aux= new typename arbol<C,F>::Nodo;
+  aux->elementoC = c;
+  aux->elementoF = f;
 	aux->h_der = der;
   aux->h_izq = izq;
 	a.raiz = aux;
-	a.iter = nullptr;
+	//a.iter = nullptr;
 }
 #endif
