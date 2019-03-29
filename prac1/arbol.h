@@ -34,10 +34,10 @@ template<typename T>
 void crearHoja (arbol<T>& a, const T& elem){
   typename arbol<T>::Nodo* aux= new typename arbol<T>::Nodo;
   aux->elemento = elem;
-	aux->h_der = nullptr;
-  aux->h_izq = nullptr;
+	aux->h_der = NULL;
+  aux->h_izq = NULL;
 	a.raiz = aux;
-	a.iter = nullptr;
+	a.iter = NULL;
 }
 
 template<typename T>
@@ -47,6 +47,6 @@ void crearArbol (arbol<T>& a, const T& elem, const arbol<T>& izq, const arbol<T>
 	aux->h_der = der;
   aux->h_izq = izq;
 	a.raiz = aux;
-	a.iter = nullptr;
+	a.iter = NULL;
 }
 #endif

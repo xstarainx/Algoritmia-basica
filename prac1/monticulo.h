@@ -2,6 +2,7 @@
 #define MONtICULO_H
 
 #include <iostream>
+#include "arbol.h"
 using namespace std;
 
 template<typename t> struct mont;
@@ -70,6 +71,7 @@ bool borrar(const mont<t>& m, const t& d) {
 
 }
 
+// Devuelve el elemento minimo o primero del monticulo
 template<typename t>
 bool min(const mont<t>& m, t minimo) {
 	if(!esVacia(m)) {
