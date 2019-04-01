@@ -38,9 +38,6 @@ private:
 template<typename t> 
 void crearVacia(mont<t>& m) {
 	m.total = 0;
-	for (int i=0; i<maxNum; ++i) {
-		m.dato[i] = '\0';
-	}
 }
 
 

@@ -21,7 +21,7 @@ void funcHuffman(map<char,int> tabla_frec) {
 	int i,fx,fy,fz;
 	arbol<char,int> z,x,y;
 
-	//crearVacia(cola);
+	crearVacia(cola);
 
 	map<char, int>::iterator it;
 	for ( it = tabla_frec.begin(); it != tabla_frec.end(); it++) {
@@ -30,8 +30,8 @@ void funcHuffman(map<char,int> tabla_frec) {
 		
 		crearHoja(x,caracter,frecuencia);
 		
-		//insertar(cola, x);
-
+		
+		//insertar(cola,x);
     	cout << "Insertando: "<< caracter << " : " << frecuencia << endl ;
 	}
 
