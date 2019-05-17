@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <map>
+#include <queue>
 #include "arbol.h"
 #include "monticulo.h"
 
@@ -15,14 +16,28 @@ const int MAX_CHARS = 300;
 using namespace std;
 
 
-/*void funcHuffman(map<char,int>tabla_frec) {
-	mont<arbol> cola;
+/*void funcHuffman(map<char,int> tabla_frec) {
+	mont<arbol <char,int> > cola;
+	//mont<arbol> cola;
 	int i,fx,fy,fz;
-	//arbol z,x,y;
+	arbol<char,int> z,x,y;
 
 	crearVacia(cola);
 
 }*/
+	map<char, int>::iterator it;
+	for ( it = tabla_frec.begin(); it != tabla_frec.end(); it++) {
+		char caracter = it->first;
+		int frecuencia = it->second;
+
+		crearHoja(x,caracter,frecuencia);
+
+
+		//insertar(cola,x);
+    	cout << "Insertando: "<< caracter << " : " << frecuencia << endl ;
+	}
+
+}
 
 
 int main(int argc, char *argv[]) {
@@ -80,12 +95,13 @@ int main(int argc, char *argv[]) {
 
 		f.close();
 
+		/*
 		//Iterador que muestra la tabla de frecuencias
 		map<char, int>::iterator it;
 		for ( it = tabla_frec.begin(); it != tabla_frec.end(); it++) {
     		std::cout << it->first << ':'<< it->second << std::endl ;
 		}
-
+		*/
 		funcHuffman(tabla_frec);
 
 	}
