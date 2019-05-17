@@ -1,5 +1,5 @@
-#ifndef MONtICULO_H
-#define MONtICULO_H
+#ifndef MONTICULO_H
+#define MONTICULO_H
 
 #include <iostream>
 #include "arbol.h"
@@ -7,42 +7,41 @@ using namespace std;
 
 const int maxNum = 256;
 
-template<typename t> struct mont;
+struct mont;
 
-template<typename t> void crearVacia(mont<t>& m);
+void crearVacia(mont& m);
 
-template<typename t> bool esVacia(const mont<t>& m);
+bool esVacia(const mont& m);
 
-template<typename t> bool insertar(const mont<t>& m, const t& d);
+bool insertar(mont& m, const arbol& d);
 
-template<typename t> bool borrar(const mont<t>& m, const t& d);
+bool borrar(mont& m);
 
-template<typename t> bool min(const mont<t>& m);
+bool min(const mont& m, arbol& minimo);
 
+int recorrer(const mont& m);
 
-template<typename t>
 struct mont {
-	friend void crearVacia<t>(mont<t>& m);
-	friend bool esVacia<t>(const mont<t>& m);
-	friend bool insertar<t>(const mont<t>& m, const t& d);
-	friend bool borrar<t>(const mont<t>& m, const t& d);
-	friend bool min<t>(const mont<t>& m);
+	friend void crearVacia(mont& m);
+	friend bool esVacia(const mont& m);
+	friend bool insertar(mont& m, const arbol& d);
+	friend bool borrar(mont& m);
+	friend bool min(const mont& m, arbol& minimo);
+	friend int recorrer(const mont& m);
 
 private:
-	t dato[maxNum];
+	arbol dato[maxNum];
 	unsigned int total;
 };
 
-
-
-template<typename t> 
-void crearVacia(mont<t>& m) {
+void crearVacia(mont& m) {
 	m.total = 0;
+	for(int i=0; i<maxNum; i++){
+		crearArbol(m.dato[i]);
+	}
 }
 
-
-template<typename t>
-bool esVacia(const mont<t>& m) {
+bool esVacia(const mont& m) {
 	if(m.total == 0) {
 		return true;
 	}
@@ -51,68 +50,70 @@ bool esVacia(const mont<t>& m) {
 	}
 }
 
-template<typename t> 
-bool insertar(const mont<t>& m, const t& d) {
+bool insertar(mont& m, const arbol& d) {
+	bool res=false;
 	int i;
 	bool debeSubir;
-	t aux;
+	arbol aux;
+	crearArbol(aux);
 
-	if(m.total==maxNum) {
-		return false;
-	}
-	else {
-		m.total++;
-		m.dato[m.total] = d;
+	if(m.total!=maxNum) {
+		res=true;
+		asignar(m.dato[m.total], d);
 		i = m.total;
-		if(i > 1) {
-			debeSubir = m.dato[i]<m.dato[i/2];
+		m.total++;
+		if(i > 0) {
+			debeSubir = esMenor(m.dato[i], m.dato[i/2]);
 		}
 		else {
 			debeSubir = false;
 		}
-		while (i > 1) {
-			aux = m.dato[i];
-			m.dato[i] = m.dato[i/2];
-			m.dato[i/2] = aux;
+		while (debeSubir) {
+			asignar(aux, m.dato[i]);
+			asignar(m.dato[i], m.dato[i/2]);
+			asignar(m.dato[i/2], aux);
 			i = i/2;
-			if(i > 1) {
-				debeSubir = m.dato[i]<m.dato[i/2];
+			if(i > 0) {
+				debeSubir = esMenor(m.dato[i], m.dato[i/2]);
 			}
 			else {
 				debeSubir = false;
 			}
 		}
 	}
+	//vaciarArbol(aux); IMPORTANTE!!!
+	return res;
 }
 
-template<typename t>
-bool borrar(const mont<t>& m, const t& d) {
+bool borrar(mont& m) {
 	int i,j;
-	t aux;
-	m.dato[0] = m.dato[m.total];
+	arbol aux;
+	crearArbol(aux);
+	asignar(m.dato[0], m.dato[m.total]);
 	m.total--;
 	i = 1;
 	while(i <= (m.total/2)) {
-		if(m.dato[2*i] < m.dato [2*i+1] || (2*i == m.total)) {
+		if(esMenor(m.dato[2*i], m.dato[2*i+1]) || (2*i == m.total)) {
 			j = 2*i+1;
 		}
-		if (m.dato[i] > m.dato[j]) {
-			aux = m.dato[i];
-			m.dato[i] = m.dato[j];
-			m.dato[j] = aux;
+		if (esMayor(m.dato[i], m.dato[j])) {
+			asignar(aux, m.dato[i]);
+			asignar(m.dato[i],  m.dato[j]);
+			asignar(m.dato[j], aux);
 			i = j;
 		}
 		else {
 			i = m.total;
 		}
 	}
+	//vaciarArbol(aux); IMPORTANTE!!!
 }
 
 // Devuelve el elemento minimo o primero del monticulo
-template<typename t>
-bool min(const mont<t>& m, t minimo) {
+bool min(const mont& m, arbol& minimo) {
 	if(!esVacia(m)) {
-		minimo = m.dato[0];
+		//minimo = m.dato[0];
+		asignar(minimo, m.dato[0]);
 		return true;
 	}
 	else {
@@ -120,5 +121,16 @@ bool min(const mont<t>& m, t minimo) {
 	}
 }
 
+int recorrer(const mont& m){
+	int tot=0;
+	char c; int f;
+	for(int i=0; i<maxNum; i++){
+		if(getRaiz(m.dato[i],c,f)){
+			cout << c << " --- " << f << endl;
+			tot++;
+		}
+	}
+	return tot;
+}
 
 #endif

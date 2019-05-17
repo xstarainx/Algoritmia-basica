@@ -9,36 +9,54 @@
 
 #include "pilaGenerica.h"
 
-template<typename C, typename F> struct arbol;
+struct arbol;
 
-template<typename C, typename F> void crearHoja (arbol<C,F>& a, const C& c, const F& f);
+void crearArbol(arbol& a);
 
-template<typename C, typename F> void crearArbol (arbol<C,F>& a, const C& c, const F& f, const arbol<C,F>& izq, const arbol<C,F>& der);
+bool esVacio(const arbol& a);
+
+void anyadirHoja(arbol& a, const char& c, const int& f);
+
+void juntarArboles(arbol& a, arbol& b, arbol& c);
+
+bool esMayor(const arbol& a, const arbol& b);
+
+bool esMenor(const arbol& a, const arbol& b);
+
+void asignar(arbol& a, const arbol& b);
+
+bool getRaiz(const arbol& a, char& c, int& f);
 
 //OPERACIONES DEL ITERADOR:
 //Prepara el iterador y su cursor para que el siguiente elemento (tripleta) a visitar sea el primero de la colecciónConMarca d (situación de no
 //haber visitado ningún elemento).
-template<typename C, typename F> void iniciarIterador (arbol<C,F>& a);
+void iniciarIterador (arbol& a);
 
 //Devuelve falso si ya se ha visitado el último elemento. Devuelve verdad en caso contrario
-template<typename C, typename F> bool existeSiguiente (const arbol<C,F>& a);
+bool existeSiguiente (const arbol& a);
 
 //Asigna a <c>, <v> y <m> la clave, valor y marca respectivamente del elemento visitado y avanza el iterador de <d>
 //Parcial: la operación no está definida si not existeSiguiente?(d).
-template<typename C, typename F> bool siguienteYAvanza (arbol<C,F>& a, C& c);
+bool siguienteYAvanza (arbol& a, char& c);
 
-template<typename C, typename F>
 struct arbol{
-  friend void crearHoja<C,F> (arbol<C,F>& a, const C& c, const F& f);
-  friend void crearArbol<C,F> (arbol<C,F>& a, const C& c, const F& f, const arbol<C,F>& izq, const arbol<C,F>& der);
-  friend void iniciarIterador<C,F> (arbol<C,F>& a);
-  friend bool existeSiguiente<C,F> (const arbol<C,F>& a);
-  friend bool siguienteYAvanza<C,F> (arbol<C,F>& a, C& c);
+  friend void crearArbol(arbol& a);
+  friend bool esVacio(const arbol& a);
+  friend void anyadirHoja(arbol& a, const char& c, const int& f);
+  friend void juntarArboles(arbol& a, arbol& b, arbol& c);
+  friend bool esMayor(const arbol& a, const arbol& b);
+  friend bool esMenor(const arbol& a, const arbol& b);
+  friend void asignar(arbol& a, const arbol& b);
+  friend bool getRaiz(const arbol& a, char& c, int& f);
+
+  friend void iniciarIterador(arbol& a);
+  friend bool existeSiguiente(const arbol& a);
+  friend bool siguienteYAvanza(arbol& a, char& c);
 
 	private:	//declaracion de la representacion interna del tipo:
 	struct Nodo{
-			C elementoC;
-      F elementoF;
+			char c;
+      int f;
 			Nodo* h_der;
 			Nodo* h_izq;
 	};
@@ -47,32 +65,78 @@ struct arbol{
   std::string codificacion;
 };
 
-template<typename C, typename F>
-void crearHoja (arbol<C,F>& a, const C& c, const F& f){
-  typename arbol<C,F>::Nodo* aux= new typename arbol<C,F>::Nodo;
-  aux->elementoC = c;
-  aux->elementoF = f;
+void crearArbol(arbol& a){
+  a.raiz = NULL;
+  a.codificacion="";
+}
+
+bool esVacio(const arbol& a){
+  bool res=false;
+  if(a.raiz==NULL){
+    res=true;
+  }
+  return res;
+}
+
+void anyadirHoja (arbol& a, const char& c, const int& f){
+  typename arbol::Nodo* aux= new typename arbol::Nodo;
+  aux->c = c;
+  aux->f = f;
 	aux->h_der = NULL;
   aux->h_izq = NULL;
 	a.raiz = aux;
 }
 
-template<typename C, typename F>
-void crearArbol (arbol<C,F>& a, const C& c, const F& f, const arbol<C,F>& izq, const arbol<C,F>& der){
-  typename arbol<C,F>::Nodo* aux= new typename arbol<C,F>::Nodo;
-  aux->elementoC = c;
-  aux->elementoF = f;
-	aux->h_der = der;
-  aux->h_izq = izq;
-	a.raiz = aux;
-  a.codificacion = "";
+void juntarArboles (arbol& a, arbol& b, arbol& c){
+  c.raiz->f=(a.raiz->f) + (b.raiz->f);
+  c.raiz->c='\0';
+  if((a.raiz->f) >= (b.raiz->f)){
+    c.raiz->h_der=b.raiz;  //El hijo derecho es el de menor frecuencia
+    c.raiz->h_izq=a.raiz;
+  }
+  else{
+    c.raiz->h_der=a.raiz;
+    c.raiz->h_izq=b.raiz;
+  }
+}
+
+bool esMayor(const arbol& a, const arbol& b){
+  bool res=true;
+  if((a.raiz->f) <= (b.raiz->f)){
+    res=false;
+  }
+  return res;
+}
+
+bool esMenor(const arbol& a, const arbol& b){
+  bool res=true;
+  if((a.raiz->f) >= (b.raiz->f)){
+    res=false;
+  }
+  return res;
+}
+
+void asignar(arbol& a, const arbol& b){
+  if(b.raiz==NULL){
+    std::cout << "ARBOL VACIO" << std::endl;
+  }
+  a.raiz=b.raiz;
+}
+
+bool getRaiz(const arbol& a, char& c, int& f){
+  bool res=false;
+  if(a.raiz!=NULL){
+    c=a.raiz->c;
+    f=a.raiz->f;
+    res=true;
+  }
+  return res;
 }
 
 //OPERACIONES DEL ITERADOR:
 //Prepara el iterador y su cursor para que el siguiente elemento (tripleta) a visitar sea el primero de la colecciónConMarca d (situación de no
 //haber visitado ningún elemento).
-template<typename C, typename F>
-void iniciarIterador (arbol<C,F>& a){
+/*void iniciarIterador (arbol& a){
 	crearVacia(a.iter);
 	typename arbol<C,F>::Nodo* pAux = a.raiz;
 	while(pAux != NULL){
@@ -83,15 +147,13 @@ void iniciarIterador (arbol<C,F>& a){
 }
 
 //Devuelve falso si ya se ha visitado el último elemento. Devuelve verdad en caso contrario
-template<typename C, typename F>
-bool existeSiguiente (const arbol<C,F>& a){
+bool existeSiguiente (const arbol& a){
 	return !esVacia(a.iter);
 }
 
 //Asigna a <c>, <v> y <m> la clave, valor y marca respectivamente del elemento visitado y avanza el iterador de <d>
 //Parcial: la operación no está definida si not existeSiguiente?(d).
-template<typename C, typename F>
-bool siguienteYAvanza (arbol<C,F>& a, C& c){
+bool siguienteYAvanza (arbol& a, char& c){
     bool res = true;
     bool error = false;
     if(!esVacia(a.iter) && !error){
@@ -101,7 +163,7 @@ bool siguienteYAvanza (arbol<C,F>& a, C& c){
 
         if(!error){
 	        desapilar(a.iter);
-	        c = pAux->elementoC;
+	        c = pAux->c;
 	        pAux = pAux->h_der;
           a.codificacion = (a.codificacion).substr(0, a.length()-1);
 
@@ -113,5 +175,5 @@ bool siguienteYAvanza (arbol<C,F>& a, C& c){
 	    }
     }
     return res;
-}
+}*/
 #endif
