@@ -31,22 +31,24 @@ void funcHuffman(map<char,int> tabla_frec) {
 		anyadirHoja(x,caracter,frecuencia);
 		insertar(cola,x);
 		total++;
-    //cout << "Insertando: "<< caracter << " : " << frecuencia << endl;
+    cout << "Insertando: "<< caracter << " : " << frecuencia << endl;
 	}
+
+
 
 	cout << "Total caracteres: " << total << endl;
 	int metidos=recorrer(cola); //Probando si esto va bien
 	cout << "Total metidos: " << metidos << endl;
 
-	while(min(cola, x)){
-		if(getRaiz(x,caracter,frecuencia)){
-			cout << "Frecuencia: " << frecuencia << ", caracter: " << caracter << endl;
-		}
-		else{
-			cout << "ERROR" << endl;
-		}
-		borrar(cola);
-	}
+	// while(min(cola, x)){
+	// 	if(getRaiz(x,caracter,frecuencia)){
+	// 		cout << "Frecuencia: " << frecuencia << ", caracter: " << caracter << endl;
+	// 	}
+	// 	else{
+	// 		cout << "ERROR" << endl;
+	// 	}
+	// 	borrar(cola);
+	// }
 }
 
 int main(int argc, char *argv[]) {
@@ -56,11 +58,11 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 
-  //PRUEBA
+  	//PRUEBA
 	string nom_fich = argv[1];
 	ifstream f;		//Flujo de entrada
 	ofstream f2;	//Flujo de salida
-	f.open(nom_fich);
+	f.open(argv[1]);
 
 	if (f.is_open()) {
 		cout << "Abierto correctamente" << endl;

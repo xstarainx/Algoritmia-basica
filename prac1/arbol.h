@@ -62,7 +62,7 @@ struct arbol{
 	};
 	Nodo* raiz;
 	pila<Nodo*> iter;
-  std::string codificacion;
+    std::string codificacion;
 };
 
 void crearArbol(arbol& a){

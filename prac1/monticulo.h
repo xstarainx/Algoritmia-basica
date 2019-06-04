@@ -36,7 +36,7 @@ private:
 
 void crearVacia(mont& m) {
 	m.total = 0;
-	for(int i=0; i<maxNum; i++){
+	for(int i=0; i<maxNum; i++) {
 		crearArbol(m.dato[i]);
 	}
 }
@@ -57,7 +57,7 @@ bool insertar(mont& m, const arbol& d) {
 	arbol aux;
 	crearArbol(aux);
 
-	if(m.total!=maxNum) {
+	if(m.total != maxNum) {
 		res=true;
 		asignar(m.dato[m.total], d);
 		i = m.total;
