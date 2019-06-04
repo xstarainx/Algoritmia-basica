@@ -20,6 +20,16 @@ public class Nodo {
 		return (this.estFin - this.estIni)*this.nPasajeros;
 	}
 	
+	// Devuelve la el coste estimado
+	public int getEstimacion() {
+		return estimacion;
+	}
+	
+	// Devuelve u
+	public int getU() {
+		return u;
+	}
+	
 	// Mostrar el contenido del nodo
 	public void print() {
 		System.out.println("Nodo: "+this.estIni+", "+this.estFin+", "+this.nPasajeros);

@@ -6,7 +6,6 @@ import java.util.PriorityQueue;
 import java.util.Comparator;
 import java.util.Iterator;
 import practica2.Nodo;
-import practica2.BoundedQueue;
 
 public class transporte {
 	
@@ -14,7 +13,7 @@ public class transporte {
 		// Lectua del fichero
 		Scanner fich = new Scanner (new File("pruebas.txt"));
 		
-		boolean primeraLinea=true, descartar=false, fin=false;
+		boolean descartar=false, fin=false;
 		int n=0, m=0, p=0;
 		int nX=0, mX=0, pX=0;
 		
@@ -74,27 +73,26 @@ public class transporte {
 				}
 			}
 			
+			// resetear nodo, cola prioridad etc
+			System.out.println("Tamaño: "+cola.size());
+			System.out.println("Termina");
 			
-		}
-		
 			
-		System.out.println("Tamaño: "+cola.size());
-		System.out.println("Termina");
-		
-		
-        Iterator value = cola.iterator(); 
-		while (value.hasNext()) { 
-			Nodo y = (Nodo) value.next();
-            y.print(); 
-        } 
-		
+	        Iterator<Nodo> value = cola.iterator(); 
+			while (value.hasNext()) { 
+				Nodo y = value.next();
+	            y.print(); 
+	        } 
+		}	
 		fich.close();
 	}
 	
 	
 	
-	public void calcularCosteEstimacion() {
+	public int calcularCosteEstimacion(int ben, int obj) {
 		System.out.println();
+		
+		return ben; // return ben+capLibre/peso[obj]*benef[obj]
 	}
 	
 	public void u_mejor() {
