@@ -40,6 +40,16 @@ public class Pedido {
 		return (this.estFin - this.estIni)*this.nPasajeros;
 	}
 	
+	// Actualiza el valor de coste estimado
+	public void setEstimacion(int e) {
+		this.estimacion = e;
+	}
+	
+	// Actuaiza el valor de u
+	public void setU(int _u) {
+		this.u = _u;
+	}
+	
 	// Devuelve la el coste estimado
 	public int getEstimacion() {
 		return estimacion;

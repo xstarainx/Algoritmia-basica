@@ -44,6 +44,6 @@ public class arbol {
 	}
 	
 	public int printPas() {
-		return p.getPasajeros();
+		return p.getU();
 	}
 }

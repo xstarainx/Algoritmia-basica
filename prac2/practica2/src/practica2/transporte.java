@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.ArrayList;
 
 public class transporte {
+	public static int N;
+	
 	public static void main(String args[]) throws FileNotFoundException {
 		// Lectua del fichero
 		Scanner fich = new Scanner (new File("pruebas.txt"));
@@ -30,6 +32,7 @@ public class transporte {
 			n = Integer.parseInt(fich.next());
 			m = Integer.parseInt(fich.next());
 			p = Integer.parseInt(fich.next());
+			N = p;
 			if(n == 0 && m == 0 && p == 0) {
 				fin = true;
 			}
@@ -49,13 +52,7 @@ public class transporte {
 					cola.add(x);
 				}
 				System.out.println("Pedidos: "+cola.size());
-				/*
-				Iterator<Pedido> value = cola.iterator(); 
-				while (value.hasNext()) { 
-						Pedido y = value.next();
-			            y.print(); 
-			    } 
-			    */
+
 				// Creacion del arbol de pedidos
 				ArrayList<Pedido> colaP = new ArrayList<Pedido>();
 				Pedido auxiliar;
@@ -64,13 +61,13 @@ public class transporte {
 					auxiliar = cola.poll();
 					colaP.add(auxiliar);
 				}
-
-				llenarArbol(a,colaP,C,0);
+				
+				llenarArbol(a,colaP,C,0,0);
 				mostrarArbol(a, 0);
-				for(int i=0; i<5; i++) {
-					System.out.println("En "+i+" hay "+C[i]);
-
-				}
+				recorrerArbol();
+				
+				
+			
 			}
 		}	
 		fich.close();
@@ -87,11 +84,16 @@ public class transporte {
 		}
 	}
 	
-	public static void llenarArbol(arbol a, ArrayList<Pedido> colaP, int[] C, int cont) {
+	public static void llenarArbol(arbol a, ArrayList<Pedido> colaP, int[] C, int cont, int uFacil) {
 		if(cont < colaP.size()) {
 			int ini,fini,pas;
 			Pedido x = colaP.get(cont);		// Obtener pedido actual
+					
+			//x.setEstimacion(calcularCosteEstimacion(C,cont,colaP));
+			x.setU(u_mejor(C,cont,uFacil,colaP));	
+			x.setU(uFacil);
 			a.setPedido(x);
+			uFacil = uFacil - (-(x.getBeneficio()));
 			x.print();
 	
 	        ini = x.getEstIni();
@@ -112,39 +114,70 @@ public class transporte {
 				System.out.println("Se descarta el Pedido");
 				C = aux.clone();				
 				descartar = false;
-				a.setDer(new arbol(a,n,false));		// Crear hijo derecho
-				arbol sig = a.getDer();				// Obtener hijo derecho
+				if(cont == colaP.size()-1) {
+					n.setU(uFacil);
+				}
+				a.setDer(new arbol(a,n,false));
+				
 				System.out.println("LLamada hijo derecho por descarte");
 				
-				llenarArbol(a.getDer(),colaP,C,cont+1);			// Llamada recursiva
+				llenarArbol(a.getDer(),colaP,C,cont+1,uFacil);
 			}
 			else {	// Caso meter pedido
-				a.setIzq(new arbol(a,n,true));		// Crear hijo izquierdo
-				arbol sig = a.getIzq();				// Obtener hijo izquierdo
+				if(cont == colaP.size()-1) {
+					n.setU(uFacil);
+				}
+				a.setIzq(new arbol(a,n,true));
 				System.out.println("LLamada hijo izquerdo");
 				
-				llenarArbol(a.getIzq(),colaP,C,cont+1);
+				llenarArbol(a.getIzq(),colaP,C,cont+1,uFacil);
 				
-				a.setDer(new arbol(a,n,false));		// Crear hijo derecho
-				sig = a.getDer();					// Obtener hijo derecho
+				a.setDer(new arbol(a,n,false));
 				System.out.println("LLamada hijo derecho");
 				
 				C = aux.clone();	
-				llenarArbol(a.getDer(),colaP,C,cont+1);
+				llenarArbol(a.getDer(),colaP,C,cont+1,uFacil);
 			}
 		}
 	}
 	
 	
+	public static void recorrerArbol() {
+		
+	}
 	
-	public static  int calcularCosteEstimacion(int ben, int obj) {
-		System.out.println();
+	/*
+	public static int calcularCosteEstimacion(int[] cap, int obj, ArrayList<Pedido> colaP) {
+		if(obj > N || cap[] < 0) {
+			return ben;
+		}
+		else {
+			if() {
+				
+			}
+			else {
+				
+			}
+		}
 		
 		return ben; // return ben+capLibre/peso[obj]*benef[obj]
 	}
+	*/
 	
-	public static void u_mejor() {
-		System.out.println();
+	public static int u_mejor(int[] cap, int obj, int uFacil, ArrayList<Pedido> colaP) {
+		int U = uFacil;
+		int[] ca = cap.clone();
+		Pedido x;
+		for(int i=obj; i<N; i++) {
+			x = colaP.get(i);
+			for(int j=x.getEstIni(); j<x.getEstFin(); j++) {		
+				if((ca[j] - x.getPasajeros()) >= 0) {				
+					ca[j] = ca	[j] - x.getPasajeros();	
+					uFacil = uFacil - x.getBeneficio();
+				}
+			}
+		}
+		return U;
 	}
 	
 }
