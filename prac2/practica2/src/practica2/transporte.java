@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.PriorityQueue;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.ArrayList;
 
 public class transporte {
@@ -66,8 +65,12 @@ public class transporte {
 					colaP.add(auxiliar);
 				}
 
-				llenarArbol(a,colaP,C,0,0);
+				llenarArbol(a,colaP,C,0);
 				mostrarArbol(a, 0);
+				for(int i=0; i<5; i++) {
+					System.out.println("En "+i+" hay "+C[i]);
+
+				}
 			}
 		}	
 		fich.close();
@@ -84,11 +87,11 @@ public class transporte {
 		}
 	}
 	
-	public static void llenarArbol(arbol a, ArrayList<Pedido> colaP, int[] C, int cont, int total) {
-		System.out.println("total: "+total);
+	public static void llenarArbol(arbol a, ArrayList<Pedido> colaP, int[] C, int cont) {
 		if(cont < colaP.size()) {
 			int ini,fini,pas;
 			Pedido x = colaP.get(cont);		// Obtener pedido actual
+			a.setPedido(x);
 			x.print();
 	
 	        ini = x.getEstIni();
@@ -104,7 +107,6 @@ public class transporte {
 					descartar = true;
 				}
 			}
-			a.setPedido(x);
 			Pedido n = new Pedido();
 			if(descartar) {	// Caso descartar pedido
 				System.out.println("Se descarta el Pedido");
@@ -114,19 +116,21 @@ public class transporte {
 				arbol sig = a.getDer();				// Obtener hijo derecho
 				System.out.println("LLamada hijo derecho por descarte");
 				
-				llenarArbol(sig,colaP,C,cont+1,total+1);			// Llamada recursiva
+				llenarArbol(a.getDer(),colaP,C,cont+1);			// Llamada recursiva
 			}
 			else {	// Caso meter pedido
 				a.setIzq(new arbol(a,n,true));		// Crear hijo izquierdo
 				arbol sig = a.getIzq();				// Obtener hijo izquierdo
 				System.out.println("LLamada hijo izquerdo");
 				
-				llenarArbol(sig,colaP,C,cont+1,total+1);
+				llenarArbol(a.getIzq(),colaP,C,cont+1);
+				
 				a.setDer(new arbol(a,n,false));		// Crear hijo derecho
 				sig = a.getDer();					// Obtener hijo derecho
 				System.out.println("LLamada hijo derecho");
 				
-				llenarArbol(sig,colaP,C,cont+1,total+1);
+				C = aux.clone();	
+				llenarArbol(a.getDer(),colaP,C,cont+1);
 			}
 		}
 	}
