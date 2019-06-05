@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.PriorityQueue;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.ArrayList;
 
 public class transporte {
 	public static void main(String args[]) throws FileNotFoundException {
@@ -39,7 +40,7 @@ public class transporte {
 				for(int i=0; i<m; i++) {
 					C[i] = n;
 				}
-				for(int j=0; j<p-1; j++) {
+				for(int j=0; j<p; j++) {
 					nX = Integer.parseInt(fich.next());
 					mX = Integer.parseInt(fich.next());
 					pX = Integer.parseInt(fich.next());
@@ -49,13 +50,23 @@ public class transporte {
 					cola.add(x);
 				}
 				System.out.println("Pedidos: "+cola.size());
+				/*
 				Iterator<Pedido> value = cola.iterator(); 
 				while (value.hasNext()) { 
 						Pedido y = value.next();
 			            y.print(); 
 			    } 
+			    */
 				// Creacion del arbol de pedidos
-				llenarArbol(a,cola,C);
+				ArrayList<Pedido> colaP = new ArrayList<Pedido>();
+				Pedido auxiliar;
+				int longi = cola.size();
+				for(int i=0; i<longi; i++) {
+					auxiliar = cola.poll();
+					colaP.add(auxiliar);
+				}
+
+				llenarArbol(a,colaP,C,0,0);
 				mostrarArbol(a, 0);
 			}
 		}	
@@ -73,16 +84,17 @@ public class transporte {
 		}
 	}
 	
-	public static void llenarArbol(arbol a, PriorityQueue<Pedido> cola, int[] C) {
-		if(!cola.isEmpty()) {
+	public static void llenarArbol(arbol a, ArrayList<Pedido> colaP, int[] C, int cont, int total) {
+		System.out.println("total: "+total);
+		if(cont < colaP.size()) {
 			int ini,fini,pas;
-			Pedido x = cola.peek();
+			Pedido x = colaP.get(cont);		// Obtener pedido actual
 			x.print();
 	
 	        ini = x.getEstIni();
 			fini = x.getEstFin();
 			pas = x.getPasajeros();
-			
+			// Mirar a ver si se puede incluir
 			boolean descartar = false;
 			int[] aux = C.clone();			// Clonado por si se descarta
 			for(int i=ini; i<fini; i++) {
@@ -92,30 +104,29 @@ public class transporte {
 					descartar = true;
 				}
 			}
+			a.setPedido(x);
 			Pedido n = new Pedido();
-			if(descartar) {					// Caso descartar pedido
+			if(descartar) {	// Caso descartar pedido
 				System.out.println("Se descarta el Pedido");
-				C = aux.clone();
-				cola.poll();
+				C = aux.clone();				
 				descartar = false;
 				a.setDer(new arbol(a,n,false));		// Crear hijo derecho
 				arbol sig = a.getDer();				// Obtener hijo derecho
 				System.out.println("LLamada hijo derecho por descarte");
 				
-				llenarArbol(sig,cola,C);			// Llamada recursiva
+				llenarArbol(sig,colaP,C,cont+1,total+1);			// Llamada recursiva
 			}
-			else {							// Caso meter pedido
-				cola.poll();
+			else {	// Caso meter pedido
 				a.setIzq(new arbol(a,n,true));		// Crear hijo izquierdo
 				arbol sig = a.getIzq();				// Obtener hijo izquierdo
 				System.out.println("LLamada hijo izquerdo");
 				
-				llenarArbol(sig,cola,C);
+				llenarArbol(sig,colaP,C,cont+1,total+1);
 				a.setDer(new arbol(a,n,false));		// Crear hijo derecho
 				sig = a.getDer();					// Obtener hijo derecho
 				System.out.println("LLamada hijo derecho");
 				
-				llenarArbol(sig,cola,C);
+				llenarArbol(sig,colaP,C,cont+1,total+1);
 			}
 		}
 	}

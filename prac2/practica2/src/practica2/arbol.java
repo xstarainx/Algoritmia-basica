@@ -17,6 +17,10 @@ public class arbol {
 		this.es = _es;
 	}
 	
+	public void setPedido(Pedido _p) {
+		this.p = _p;
+	}
+	
 	public void setIzq(arbol _izq) {
 		this.izq = _izq;
 	}
