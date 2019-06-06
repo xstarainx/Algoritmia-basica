@@ -5,13 +5,17 @@ import java.io.FileNotFoundException;
 import java.util.PriorityQueue;
 import java.util.Comparator;
 import java.util.ArrayList;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+
 
 public class transporte {
 	public static int N;
 	
-	public static void main(String args[]) throws FileNotFoundException {
+	public static void main(String args[]) throws FileNotFoundException, UnsupportedEncodingException {
 		// Lectua del fichero
 		Scanner fich = new Scanner (new File("pruebas.txt"));
+		PrintWriter w = new PrintWriter("resultados.txt", "UTF-8");
 		
 		PriorityQueue<Pedido> cola = new PriorityQueue<Pedido>(new Comparator<Pedido>() {	// Cola con prioridad descendente
 		    public int compare(Pedido p1, Pedido p2) {
@@ -28,6 +32,8 @@ public class transporte {
 		int[] C = {0};	// Vector capacidad por tramo
 		
 		while(!fin) {	// Obtener primera linea
+			
+			long startTime = System.nanoTime();
 			
 			n = Integer.parseInt(fich.next());
 			m = Integer.parseInt(fich.next());
@@ -62,14 +68,20 @@ public class transporte {
 					colaP.add(auxiliar);
 				}
 				
-				llenarArbol(a,colaP,C,0,0);
-				mostrarArbol(a, 0);
-				recorrerArbol();
+				arbol raiz = new arbol(); 
+				
+				llenarArbol(a,colaP,C,0,0,raiz);
+				mostrarArbol(a,0);
+				recorrerArbol(raiz,0);	// Cambiar por el nodo raiz
+				
+				long endTime   = System.nanoTime();
+				imprimirSolucion(endTime-startTime,3,w);
 				
 				
 			
 			}
 		}	
+		w.close();
 		fich.close();
 	}
 	
@@ -84,7 +96,7 @@ public class transporte {
 		}
 	}
 	
-	public static void llenarArbol(arbol a, ArrayList<Pedido> colaP, int[] C, int cont, int uFacil) {
+	public static void llenarArbol(arbol a, ArrayList<Pedido> colaP, int[] C, int cont, int uFacil, arbol raiz) {
 		if(cont < colaP.size()) {
 			int ini,fini,pas;
 			Pedido x = colaP.get(cont);		// Obtener pedido actual
@@ -93,7 +105,7 @@ public class transporte {
 			x.setU(u_mejor(C,cont,uFacil,colaP));	
 			x.setU(uFacil);
 			a.setPedido(x);
-			uFacil = uFacil - (-(x.getBeneficio()));
+			uFacil = uFacil - (x.getBeneficio());
 			x.print();
 	
 	        ini = x.getEstIni();
@@ -110,40 +122,102 @@ public class transporte {
 				}
 			}
 			Pedido n = new Pedido();
+			if(cont == colaP.size()-1) {
+				n.setU(uFacil);
+				// TABMIE AÑADIR C(X) !!!!!!!!!!!!!
+			}
 			if(descartar) {	// Caso descartar pedido
 				System.out.println("Se descarta el Pedido");
 				C = aux.clone();				
 				descartar = false;
-				if(cont == colaP.size()-1) {
-					n.setU(uFacil);
-				}
 				a.setDer(new arbol(a,n,false));
 				
 				System.out.println("LLamada hijo derecho por descarte");
+				if(cont == 0) {
+					raiz = a;
+				}
 				
-				llenarArbol(a.getDer(),colaP,C,cont+1,uFacil);
+				llenarArbol(a.getDer(),colaP,C,cont+1,uFacil,raiz);
 			}
 			else {	// Caso meter pedido
-				if(cont == colaP.size()-1) {
-					n.setU(uFacil);
-				}
 				a.setIzq(new arbol(a,n,true));
 				System.out.println("LLamada hijo izquerdo");
+				if(cont == 0) {
+					raiz = a;
+				}
 				
-				llenarArbol(a.getIzq(),colaP,C,cont+1,uFacil);
+				llenarArbol(a.getIzq(),colaP,C,cont+1,uFacil,raiz);
 				
 				a.setDer(new arbol(a,n,false));
 				System.out.println("LLamada hijo derecho");
 				
 				C = aux.clone();	
-				llenarArbol(a.getDer(),colaP,C,cont+1,uFacil);
+				llenarArbol(a.getDer(),colaP,C,cont+1,uFacil,raiz);
 			}
 		}
 	}
 	
 	
-	public static void recorrerArbol() {
-		
+	public static void recorrerArbol(arbol a, int cont) {
+		if(a.izq == null && a.der == null) {	// Es nodo hoja(posible solucion)
+			System.out.println("final: "+cont);
+		}
+		else if(a.izq == null) {	// Solo tiene hijo derecho
+			arbol y = a.der;
+			if(y.p.estimacion <= y.p.u) {	// Solo si c(x) <= U del hijo der
+				System.out.println("Comparando "+y.p.estimacion+" con "+y.p.u+ " y va por der");
+				recorrerArbol(a.der,cont+1);
+			}
+			else {
+				System.out.println("error1");
+			}
+		}
+		else if(a.izq != null && a.der != null) {	// Tiene los dos hijos
+			arbol x = a.izq;
+			arbol y = a.der;
+			if(x.p.estimacion < y.p.estimacion) {	// Es mejor el izq
+				if(x.p.estimacion <= x.p.u) {	// Solo si c(x) <= U del hijo izq
+					System.out.println("Comparando "+x.p.estimacion+" con "+x.p.u+ " y va por izq");
+					recorrerArbol(a.izq,cont+1);
+				}
+				else {
+					System.out.println("error2");
+				}
+			}
+			else if (x.p.estimacion > y.p.estimacion) {	// es mejor la der
+				if(y.p.estimacion <= y.p.u) {	// Solo si c(x) <= U del hijo der
+					System.out.println("Comparando "+y.p.estimacion+" con "+y.p.u+ " y va por der");
+					recorrerArbol(a.der,cont+1);
+				}
+				else {
+					System.out.println("error3");
+				}
+			}
+			else {	// si hay que comparar las U
+				if(x.p.u <= y.p.u) {	// es mejor la u de izq
+					if(x.p.estimacion <= x.p.u) {	// Solo si c(x) <= U del hijo izq
+						System.out.println("Comparando "+x.p.estimacion+" con "+x.p.u+ " y va por izq");
+						recorrerArbol(a.izq,cont+1);
+					}
+					else {
+						System.out.println("error4");
+					}
+				}
+				else {	// es mejor la u de der
+					if(y.p.estimacion <= y.p.u) {	// Solo si c(x) <= U del hijo der
+						System.out.println("Comparando "+y.p.estimacion+" con "+y.p.u+ " y va por der");
+						recorrerArbol(a.der,cont+1);
+					}
+					else {
+						System.out.println("error5");
+					}
+				}
+			}
+		}
+		else {
+			System.out.println("error");
+		}
+
 	}
 	
 	/*
@@ -170,14 +244,19 @@ public class transporte {
 		Pedido x;
 		for(int i=obj; i<N; i++) {
 			x = colaP.get(i);
-			for(int j=x.getEstIni(); j<x.getEstFin(); j++) {		
-				if((ca[j] - x.getPasajeros()) >= 0) {				
-					ca[j] = ca	[j] - x.getPasajeros();	
-					uFacil = uFacil - x.getBeneficio();
+			for(int j=x.getEstIni(); j<x.getEstFin(); j++) {	
+				if((ca[j] - x.getPasajeros()) >= 0) {			
+					ca[j] = ca[j] - x.getPasajeros();	
+					U = U - x.getBeneficio();
 				}
 			}
 		}
 		return U;
+	}
+	
+	public static void imprimirSolucion(long time, int ben, PrintWriter w) throws FileNotFoundException, UnsupportedEncodingException {
+		double seconds = (double)time / 1_000_000_000.0;
+		w.println(ben+" "+seconds);
 	}
 	
 }
