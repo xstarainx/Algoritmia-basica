@@ -1,0 +1,283 @@
+/*
+ * Fichero de prueba
+ */
+#include <iostream>
+#include "monticulo.h"
+#include "arbol.h"
+#include <stdlib.h>
+#include <fstream>
+#include <map>
+
+using namespace std;
+
+const int MAX_CHARS = 300;
+
+void funcHuffman(map<char,int> tabla_frec, arbol& z, int& total) {
+	int i,fx,fy,fz;
+	char cx, cy;
+	arbol x,y;
+	map<char, int>::iterator it;
+	char caracter;
+	int frecuencia;
+
+	total=0;
+	mont cola; crearVacia(cola);
+	for( it = tabla_frec.begin(); it != tabla_frec.end(); it++) {
+		caracter = it->first;
+		frecuencia = it->second;
+		//anyadirHoja(x,caracter,frecuencia);
+		total=total+frecuencia;
+		insertarHoja(cola, caracter, frecuencia); //Inserta en el monticulo un arbol (que solo tiene una hoja con el car. y la frec.)
+	}
+
+	crearArbol(x);
+	crearArbol(y);
+
+	int totalCMonticulo = cardinal(cola);
+
+	char c1, c2;
+	for (i=1; i<totalCMonticulo; i++){
+		min(cola, x);
+		getF(x, fx);
+		getC(x, c1);
+		borrarMin(cola);
+
+		min(cola, y);
+		getF(y, fy);
+		getC(y, c2);
+		borrarMin(cola);
+		fz = fx + fy;
+		anyadirHoja(z, '\0', fz);
+		juntarArboles(z, x, y);
+		insertarArbol(cola, z);
+	}
+
+	min(cola, z);
+	borrarMin(cola);
+}
+
+int main(int argc, char *argv[]) {
+	//////////////////////////////////////////
+	////// ACORDARSE DE BORRAR NODOS !! /////
+	/////////////////////////////////////////
+
+
+	//Si el numero de parametros es incorrecto indicar y finalizar
+	string tipo = argv[1];
+	if (argc != 3 || (tipo!="-c" && tipo!="-d")) {
+		cout << "Numero de parametros incorrecto." << endl;
+		cout << "Sintaxis: ./huf [-c|-d] <nombre de fichero>" << endl;
+		exit(0);
+	}
+
+	string nom_fich = argv[2];
+	ifstream f;		//Flujo de entrada
+	ofstream f2;	//Flujo de salida
+	if(tipo=="-c"){
+		int pos = 0;
+		for(int i = nom_fich.length()-1; i>=0; i--){
+			if(nom_fich[i]=='.'){
+				i=-1;
+			}
+			else{
+				pos++;
+			}
+		}
+
+		string nomHuf = nom_fich.substr(0, nom_fich.length()-pos) + "huf";
+
+		f.open(nom_fich);
+		if (f.is_open()) {
+
+			char c;
+			map<char,int> tabla_frec;
+			//Recorrido del fichero contando apariciones
+			while(!f.eof()) {
+				c = f.get();
+				tabla_frec[c] += 1;
+			}
+
+			f.close();
+
+			arbol z;
+			crearArbol(z);
+
+			int totalC = 0;
+			funcHuffman(tabla_frec, z, totalC);
+			map<char, string> tabla_cod;
+			codificar(z, tabla_cod);
+
+			f2.open(nomHuf);
+			if(f2.is_open()){
+				f2 <<  totalC;
+				f2 << ".";
+
+				map<char, string>::iterator itCod;
+				string codificacion;
+				char caracter;
+				for( itCod = tabla_cod.begin(); itCod != tabla_cod.end(); itCod++) {
+					caracter = itCod->first;
+					codificacion = itCod->second;
+
+			    f2 << caracter << "," << codificacion << ";";
+				}
+				f2 << "..";
+
+				f.open(nom_fich);
+				if(f.is_open()){
+
+
+					string cod;
+					int numBits = 0;
+					unsigned char n=0;
+					while(!f.eof()) {
+						c = f.get();
+						cod = tabla_cod[c];
+
+						for(int i=0; i<cod.length(); i++){
+							if(numBits == 8){
+								f2.write((char*)(&n), sizeof(char));
+								numBits=0;
+								n=0;
+							}
+
+							if(numBits == 0){
+								if(cod[i]=='1'){
+									n = n | 0x01;
+								}
+								else{
+									n = n | 0x00;
+								}
+							}
+							else{
+								n = n << 1;
+								if(cod[i]=='1'){
+									n = n | 0x01;
+								}
+								else{
+									n = n | 0x00;
+								}
+							}
+							numBits++;
+							//f2.write((char*)(&cod[i]), sizeof(char));
+						}
+						//f2 << tabla_cod[c];
+					}
+
+					n = n << (8-numBits);
+					f2.write((char*)(&n), sizeof(char));
+
+					//f2 << flush;
+					f.close();
+					f2.close();
+				}
+				else{
+					cout << "Error al reabrir el fichero" << nom_fich << endl;
+				}
+			}
+			else{
+				cout << "Error al crear el fichero codificado" << endl;
+			}
+		}
+		else {
+			cout << "Error al abrir el fichero o nombre de fichero incorrecto " << nom_fich << endl;
+		}
+	}
+	else if(tipo=="-d"){
+		int pos = 0;
+		for(int i = nom_fich.length()-1; i>=0; i--){
+			if(nom_fich[i]=='.'){
+				i=-1;
+			}
+			else{
+				pos++;
+			}
+		}
+
+		string extension = nom_fich.substr(nom_fich.length()-pos, pos);
+		if(extension!="huf"){
+			cout << "El archivo especificado para decodificar no es de tipo .huf" << endl;
+			exit(0);
+		}
+
+		string nomTxt = nom_fich.substr(0, nom_fich.length()-pos) + "txt";
+		nomTxt = "a"+nomTxt;
+		f.open(nom_fich);
+		if(f.is_open()){
+			map<string, char> tabla_decod;
+			char c1, c2, c3;
+			string decod = "";
+			int totalC;
+
+			f >> totalC;
+			c1 = f.get(); //Para quitar el '.' de despues del totalC
+
+			c1 = f.get();
+			c2 = f.get();
+			while(c1!='.' || c2!='.'){	//Sacamos tabla
+				c3 = f.get();
+
+				while (c3!=';'){
+					decod = decod + c3;
+					c3 = f.get();
+				}
+
+				tabla_decod[decod]=c1;
+				decod="";
+				c1 = f.get();
+				c2 = f.get();
+			}
+
+			//////////////////////Decodificando///////////////////////////////
+			string clave="";
+			ofstream f4;
+			unsigned char cAux;
+			int numBits;
+			bool termina = false;
+			int totalCEscritos = 0;
+
+			f4.open(nomTxt);
+			if(f4.is_open()){
+				c1 = f.get();
+				numBits=0;
+
+				while(!f.eof() && !termina) {
+					while(numBits<8){
+						cAux = c1 & 0x80;
+						cout << (int)cAux << endl;
+						if((int)cAux==128){
+							clave = clave + "1";
+						}
+						else{
+							clave = clave + "0";
+						}
+
+						if((tabla_decod.find(clave)!=tabla_decod.end()) && (int(tabla_decod[clave])!=-1)){
+								f4 << tabla_decod[clave];
+								clave = "";
+								totalCEscritos++;
+								if(totalCEscritos==totalC){
+									termina=true;
+									numBits=8; //Para salir de este bucle
+								}
+						}
+						numBits++;
+						c1 = c1 << 1;
+					}
+
+					numBits=0;
+					c1=f.get();
+				}
+
+				f4.close();
+				f.close();
+			}
+			else{
+				cout << "Error al crear el fichero decodificado" << endl;
+			}
+		}
+		else{
+			cout << "Error al abrir el fichero codificado para descodificar" << endl;
+		}
+	}
+}
