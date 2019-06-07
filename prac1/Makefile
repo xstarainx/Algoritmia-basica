@@ -19,21 +19,26 @@ CC = g++         # para compilar
 CPPFLAGS=-I. -O2 -std=c++11     # opciones compilación
 #---------------------------------------------------------
 # vars
-EJEC = prueba
+MONT = monticulo
+ARBOL = arbol
+EJEC = huf
 
-all: ${EJEC} #lo que se generará al ejecutar "make"
+
+all: ${MONT} ${ARBOL} ${EJEC} #lo que se generará al ejecutar "make"
 #---------------------------------------------------------
 # "linkar" y generar ejecutable. Indicamos que "main_p2_e1" requiere "main_p2_e1.o"
-${EJEC}: ${EJEC}.o 
-	${CC} ${EJEC}.o -o ${EJEC} ${CPPFLAGS}
+${MONT}: ${MONT}.o
+	${CC} ${CPPFLAGS} ${MONT}.cpp -c -o ${MONT}.o
 
-#---------------------------------------------------------
-# compilar: generará "main_p2_e1.o". Indicamos que depende de "main_p2_e1.cpp"
-${EJEC}.o: ${EJEC}.cpp
-	${CC} -c ${EJEC}.cpp
+${ARBOL}: ${ARBOL}.o
+	${CC} ${CPPFLAGS} ${ARBOL}.cpp -c -o ${ARBOL}.o
 
+${EJEC}: ${EJEC}.o
+	${CC}  ${CPPFLAGS} ${EJEC}.cpp ${MONT}.o ${ARBOL}.o -o ${EJEC}
 
 #---------------------------------------------------------
 # Cuidado con lo que se pone aquí, que se borra sin preguntar
 clean:
-	$(RM) ${EJEC}.o ${EJEC} 
+	$(RM) ${EJEC}.o ${EJEC}
+	$(RM) ${ARBOL}.o ${ARBOL}
+	$(RM) ${MONT}.o ${MONT}
