@@ -9,13 +9,20 @@ public class arbol {
 			
 	
 	// Constructor vacio
-	public arbol() {}
+	public arbol() {
+		this.izq = null;
+		this.der = null;
+		this.p = null;
+		this.padre = null;
+	}
 	
 	// Constructor con parametros
 	public arbol(arbol _padre, Pedido _p, boolean _es) {
 		this.padre = _padre;
 		this.p = _p;
 		this.es = _es;
+		this.izq = null;
+		this.der = null;
 	}
 	
 	// Actualizar pedido

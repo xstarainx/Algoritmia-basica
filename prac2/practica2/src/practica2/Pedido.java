@@ -1,12 +1,13 @@
 package practica2;
 
 public class Pedido {
-	int estIni;			// Estacion inicial
-	int estFin;			// Estacion final
-	int nPasajeros;		// Numero de pasajeros
+	public int estIni;			// Estacion inicial
+	public int estFin;			// Estacion final
+	public int nPasajeros;		// Numero de pasajeros
+	public int uFacil;
 	
-	int estimacion;
-	int u;
+	public int estimacion;
+	public int u;
 	
 	
 	// Constructor vacio
@@ -14,9 +15,9 @@ public class Pedido {
 		
 	// Constructor con parametros
 	public Pedido(int _estIni, int _estFin, int _nPasajeros) {
-		estIni = _estIni;
-		estFin = _estFin;
-		nPasajeros = _nPasajeros;
+		this.estIni = _estIni;
+		this.estFin = _estFin;
+		this.nPasajeros = _nPasajeros;
 		// Falta asignar estimacion y u
 	}
 	
@@ -52,12 +53,20 @@ public class Pedido {
 	
 	// Devuelve la el coste estimado
 	public int getEstimacion() {
-		return estimacion;
+		return this.estimacion;
 	}
 	
 	// Devuelve u
 	public int getU() {
-		return u;
+		return this.u;
+	}
+	
+	public int getUfacil() {
+		return this.uFacil;
+	}
+	
+	public void setUfacil(int uf) {
+		this.uFacil = uf;
 	}
 	
 	// Mostrar el contenido del nodo

@@ -43,7 +43,6 @@ public class transporte {
 				fin = true;
 			}
 			else {		// Generar cola
-				arbol a = new arbol();
 				C = new int[m];
 				for(int i=0; i<m; i++) {
 					C[i] = n;
@@ -66,13 +65,17 @@ public class transporte {
 				for(int i=0; i<longi; i++) {
 					auxiliar = cola.poll();
 					colaP.add(auxiliar);
+					Pedido y = colaP.get(i);
+					y.print();
 				}
 				
 				arbol raiz = new arbol(); 
 				
-				llenarArbol(a,colaP,C,0,0,raiz);
+				arbol a = new arbol();
+				//llenarArbol(a,colaP,C,0,0,0,raiz);
+				prueba(a,colaP,C,0,0);
 				mostrarArbol(a,0);
-				recorrerArbol(raiz,0);	// Cambiar por el nodo raiz
+				//recorrerArbol(raiz,0);	// Cambiar por el nodo raiz
 				
 				long endTime   = System.nanoTime();
 				imprimirSolucion(endTime-startTime,3,w);
@@ -91,22 +94,97 @@ public class transporte {
 			for(int i=0;i<cont;i++){
 				System.out.print("    ");
 			}
-			System.out.println(al.printPas());
+			System.out.println(al.p.uFacil);
 			mostrarArbol(al.getIzq(),cont+1);
 		}
 	}
 	
-	public static void llenarArbol(arbol a, ArrayList<Pedido> colaP, int[] C, int cont, int uFacil, arbol raiz) {
+	public static void prueba(arbol a, ArrayList<Pedido> colaP, int[] C,  int cont, int uFacil) {
 		if(cont < colaP.size()) {
 			int ini,fini,pas;
 			Pedido x = colaP.get(cont);		// Obtener pedido actual
-					
-			//x.setEstimacion(calcularCosteEstimacion(C,cont,colaP));
-			x.setU(u_mejor(C,cont,uFacil,colaP));	
-			x.setU(uFacil);
+			
+			if(cont == 0) {
+				x.setU(0);
+				int uu = u_mejor(C,cont,uFacil,colaP);
+				x.setU(uu);
+			}
+			else {
+				int uu = u_mejor(C,cont,uFacil,colaP);
+				x.setU(uu);
+				System.out.println("METIDOOOOO: "+x.getU());
+			}
+			x.setUfacil(uFacil);
+			a.p = x;
+			//a.setPedido(x);
+	        ini = x.getEstIni();
+			fini = x.getEstFin();
+			pas = x.getPasajeros();
+			boolean descartar = false;
+			int[] aux = C.clone();			// Clonado por si se descarta
+			for(int i=ini; i<fini; i++) {
+				C[i] = C[i] - pas;			// Restar pasajeros del pedido
+				if(C[i] < 0) {				// Se ha pasado, se descarta el Pedido
+					descartar = true;
+				}
+			}
+			Pedido n = new Pedido();			
+			if(descartar) {	// Caso descartar pedido
+				C = aux.clone();				
+				descartar = false;
+				
+				for (int i=0; i<C.length; i++) {
+					System.out.print(" "+C[i]+" ");
+				}
+				
+				System.out.println();
+				a.setDer(new arbol(a,n,false));
+
+				prueba(a.getDer(),colaP,C,cont+1,uFacil);
+				
+			}
+			else {	// Caso meter pedido
+				for (int i=0; i<C.length; i++) {
+					System.out.print(" "+C[i]+" ");
+				}
+				System.out.println();
+				
+				a.setIzq(new arbol(a,n,true));
+				int uFacilSig = uFacil -x.getBeneficio();
+				System.out.println("ddlsfjlsdjfdslfj: "+uFacilSig);
+				prueba(a.getIzq(),colaP,C,cont+1,uFacil-x.getBeneficio());
+				
+				C = aux.clone();			
+				a.setDer(new arbol(a,n,false));	
+				
+				for (int i=0; i<C.length; i++) {
+					System.out.print(" "+C[i]+" ");
+				}
+				System.out.println();
+				prueba(a.getDer(),colaP,C,cont+1,uFacil);
+			}
+		}
+	}
+	
+	public static void llenarArbol(arbol a, ArrayList<Pedido> colaP, int[] C, int cont, int ben, int uFacil, arbol raiz) {
+		if(cont < colaP.size()) {
+			
+			int ini,fini,pas;
+			Pedido x = colaP.get(cont);		// Obtener pedido actual
+			
+			x.setEstimacion(calcularCosteEstimacion(C,cont,ben,colaP));
+			System.out.println("LLAMANDO A U");
+			if(cont == 0) {
+				x.setU(0);
+			}
+			else {
+				x.setU(u_mejor(C,cont,uFacil,colaP));
+				
+			}
+				
+			
 			a.setPedido(x);
-			uFacil = uFacil - (x.getBeneficio());
-			x.print();
+			System.out.println("arbol insertado con u: "+a.p.getU());
 	
 	        ini = x.getEstIni();
 			fini = x.getEstFin();
@@ -116,7 +194,6 @@ public class transporte {
 			int[] aux = C.clone();			// Clonado por si se descarta
 			for(int i=ini; i<fini; i++) {
 				C[i] = C[i] - pas;			// Restar pasajeros del pedido
-				System.out.println("Ahora en "+i+" hay "+C[i]);
 				if(C[i] < 0) {				// Se ha pasado, se descarta el Pedido
 					descartar = true;
 				}
@@ -124,35 +201,37 @@ public class transporte {
 			Pedido n = new Pedido();
 			if(cont == colaP.size()-1) {
 				n.setU(uFacil);
+				System.out.println("Ojoooooo");
 				// TABMIE AÑADIR C(X) !!!!!!!!!!!!!
 			}
+			
+			
 			if(descartar) {	// Caso descartar pedido
-				System.out.println("Se descarta el Pedido");
 				C = aux.clone();				
 				descartar = false;
 				a.setDer(new arbol(a,n,false));
 				
-				System.out.println("LLamada hijo derecho por descarte");
 				if(cont == 0) {
 					raiz = a;
 				}
 				
-				llenarArbol(a.getDer(),colaP,C,cont+1,uFacil,raiz);
+				llenarArbol(a.getDer(),colaP,C,cont+1,ben,uFacil,raiz);
 			}
 			else {	// Caso meter pedido
 				a.setIzq(new arbol(a,n,true));
-				System.out.println("LLamada hijo izquerdo");
 				if(cont == 0) {
 					raiz = a;
 				}
-				
-				llenarArbol(a.getIzq(),colaP,C,cont+1,uFacil,raiz);
+				int benf = x.getBeneficio();
+				int uFacilsig = uFacil - (x.getBeneficio());
+				System.out.println("Le paso uFacil con "+uFacilsig);
+				System.out.println("Nodo en nivel: "+cont+" con u: "+x.getU());
+				llenarArbol(a.getIzq(),colaP,C,cont+1,ben+benf,uFacilsig,raiz);
 				
 				a.setDer(new arbol(a,n,false));
-				System.out.println("LLamada hijo derecho");
 				
 				C = aux.clone();	
-				llenarArbol(a.getDer(),colaP,C,cont+1,uFacil,raiz);
+				llenarArbol(a.getDer(),colaP,C,cont+1,ben,uFacil,raiz);
 			}
 		}
 	}
@@ -220,23 +299,42 @@ public class transporte {
 
 	}
 	
-	/*
-	public static int calcularCosteEstimacion(int[] cap, int obj, ArrayList<Pedido> colaP) {
-		if(obj > N || cap[] < 0) {
+	
+	public static int calcularCosteEstimacion(int[] cap, int obj, int ben, ArrayList<Pedido> colaP) {
+		if(obj > N) {	// Mirar si eres ultimo nodo del arbol
 			return ben;
 		}
-		else {
-			if() {
-				
-			}
-			else {
-				
+		int tope = 0;
+		for(int i=0; i<cap.length; i++) {
+			if(cap[i] == 0) {
+				tope++;
 			}
 		}
-		
-		return ben; // return ben+capLibre/peso[obj]*benef[obj]
+		if(tope == cap.length) {	// Mirar si ya no caben mas pedidos
+			return ben;
+		}
+		int[] ca = cap.clone();		// Clonado para no alterar el vector bueno
+		Pedido x;
+		// Recorrer desde el nodo en el que estoy(pedido actual) hasta el último válido (intentando 
+		//    meter todos los pedidos)
+		for(int i=obj; i<N; i++) {
+			x = colaP.get(i);
+			// Para cada nodo (pedido) comprobar si se pueden meter los pasajeros
+			for(int j=x.getEstIni(); j<x.getEstFin(); j++) {	
+				if((ca[j] - x.getPasajeros()) < 0) {	// Si se pasa, calculo todos los que puedo meter y el beneficio
+					ca[j] = 0;
+					int pasajerosMetidos = x.getPasajeros() - ca[j];
+					ben = ben - ((x.getEstIni() - x.getEstFin()) * pasajerosMetidos);
+				}
+				else {	// Si caben resto los pasajeros al vector
+					ca[j] = ca[j] - x.getPasajeros();
+					ben = ben - x.getBeneficio();
+				}
+			}
+		}
+		return ben;
 	}
-	*/
+	
 	
 	public static int u_mejor(int[] cap, int obj, int uFacil, ArrayList<Pedido> colaP) {
 		int U = uFacil;
@@ -244,13 +342,26 @@ public class transporte {
 		Pedido x;
 		for(int i=obj; i<N; i++) {
 			x = colaP.get(i);
+			boolean descartar = false;
+			System.out.println(" 	Buscando U-mejor en nodo: "+x.getEstIni()+" y "+x.getEstFin());
 			for(int j=x.getEstIni(); j<x.getEstFin(); j++) {	
 				if((ca[j] - x.getPasajeros()) >= 0) {			
 					ca[j] = ca[j] - x.getPasajeros();	
-					U = U - x.getBeneficio();
+				}
+				else {
+					descartar = true;
 				}
 			}
+			if(descartar) {
+				descartar = false;
+			}
+			else {
+				U = U - x.getBeneficio();
+				System.out.println(" 	Sumando beneficio: "+U);
+			}
+
 		}
+		System.out.println("      Definitivamente devuleve: "+U);
 		return U;
 	}
 	
